@@ -1,0 +1,10 @@
+venv/
+output.json
+.pytest_cache
+ __pycache__/
+ archive/
+.idea
+pytest_html_report.html
+uiautomationTests/__pycache__/
+uiautomationTests/automationEnv/
+uiautomationTests/tests/__pycache__/
