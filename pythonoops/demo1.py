@@ -1,4 +1,4 @@
-from pythonOops.demo import Student
+from pythonoops.demo import Student
 
 
 class Demo1:

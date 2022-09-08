@@ -1,6 +1,5 @@
-# Creates a string to wrap in single quotes
-a = "\'Dwaipayan\'"
-print(a)
-# Unwrapping the string wrapped in single quotes
-print(a.replace('\'', ""))
+""" Creates a string to wrap in single quotes """
 
+A = "\'Dwaipayan\'"
+print(A, )
+print("After wrapping the string with single quotes: " + A.replace('\'', ""))

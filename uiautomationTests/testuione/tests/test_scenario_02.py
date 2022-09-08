@@ -1,4 +1,4 @@
-from uiautomationTests.TestUIOne.utility.base_test import BaseClass
+from uiautomationtests.testuione.utility.base_test import BaseClass
 
 
 class TestScenario2(BaseClass):
