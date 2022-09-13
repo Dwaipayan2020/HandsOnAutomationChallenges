@@ -35,4 +35,4 @@ class BaseClass:
         """Returns linkedIn credentials."""
 
         return get_data('credentials', 'LinkedIn', 'username'), \
-               get_data('credentials', 'LinkedIn', 'password')
+            get_data('credentials', 'LinkedIn', 'password')

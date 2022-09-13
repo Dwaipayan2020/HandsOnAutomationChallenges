@@ -1,6 +1,7 @@
 """This module is created to prototype selenium webdriver actions on any browser
    used across different test suits.
 """
+import time
 
 
 def take_screenshot(driver, file_name):
@@ -10,7 +11,8 @@ def take_screenshot(driver, file_name):
     :param file_name: screenshot file name with target destination.
     """
 
-    driver.get_screenshot_as_file(file_name)
+    driver.save_screenshot(file_name)
+    # time.sleep(5)
 
 
 def close_current_window(driver):

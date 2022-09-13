@@ -1,3 +1,6 @@
+import os
+import time
+
 import pytest
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -7,6 +10,8 @@ from uiautomationtests.configure_framework.browser_actions import exit_current_s
 from uiautomationtests.configure_framework.browser_actions import take_screenshot
 from uiautomationtests.configure_framework.framework_config_utils import get_driver_path
 from uiautomationtests.testuione.configure_project.project_utils import create_new_markers
+from uiautomationtests.testuione.configure_project.project_utils import launch_allure_report
+from uiautomationtests.testuione.configure_project.project_utils import LAUNCH_ALLURE_REPORT_COMMAND
 from uiautomationtests.testuione.configure_project.project_utils import update_addopts
 
 DRIVER = None
@@ -33,7 +38,7 @@ def setup(request):
     global REPORTER
 
     REPORTER = request.config.getoption("reporter")
-    # set_execution_flags(REPORTER)
+    set_execution_flags(REPORTER)
     print("inside set up")
     browser_name = request.config.getoption("browser")
 
@@ -51,32 +56,35 @@ def setup(request):
 
     yield DRIVER
     print("\nsession level execution is completed.\n")
+
     close_current_window(DRIVER)
     exit_current_session(DRIVER)
+    if REPORTER == 'allure':
+        time.sleep(1)
+        launch_allure_report(LAUNCH_ALLURE_REPORT_COMMAND)
 
 
-# @pytest.hookimpl(hookwrapper=True)
-# def pytest_runtest_makereport(item):
-#     pytest_html = item.config.pluginmanager.getplugin("html")
-#     outcome = yield
-#     report = outcome.get_result()
-#     extra = getattr(report, "extra", [])
-#     if report.when == "call" or report.when == "setup":
-#         # always add url to report
-#         file_name = os.path.join('C://Users/Dwaipayan_Das/PycharmProjects/HandsOnAutomationChallenges'
-#                                  '/uiautomationtests/testuione/reports/', report.nodeid.replace("::", "_") + ".png")
-#         # destination_file = os.path.join(report_directory, file_name)
-#         capture_screenshot(file_name)
-#         if file_name:
-#             html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
-#                    'onclick="window.open(this.src)" align="right"/></div>' % file_name
-#         extra.append(pytest_html.extras.html(html))
-#         xfail = hasattr(report, "wasxfail")
-#         if (report.skipped and xfail) or (report.failed and not xfail):
-#             # only add additional html on failure
-#             extra.append(pytest_html.extras.html("<div>Additional HTML</div>"))
-#             pass
-#         report.extra = extra
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item):
+    pytest_html = item.config.pluginmanager.getplugin("html")
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, "extra", [])
+    if report.when == "call" or report.when == "setup":
+        # always add url to report
+        f_name = str(report.nodeid.replace("::", "_") + ".png")
+        file_name = os.path.join('./uiautomationtests/testuione/screenshots/', f_name[16:36]+'_.png')
+        capture_screenshot(file_name)
+        if file_name:
+            html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
+                   'onclick="window.open(this.src)" align="right"/></div>' % file_name
+        extra.append(pytest_html.extras.html(html))
+        xfail = hasattr(report, "wasxfail")
+        if (report.skipped and xfail) or (report.failed and not xfail):
+            # only add additional html on failure
+            extra.append(pytest_html.extras.html("<div>Additional HTML</div>"))
+            pass
+        report.extra = extra
 
 
 def pytest_html_report_title(report):

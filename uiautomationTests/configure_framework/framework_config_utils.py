@@ -10,7 +10,8 @@ import os
 from configparser import ConfigParser
 
 __CURR_DIR = os.path.dirname(os.path.realpath(__file__))
-__CONFIG = ConfigParser()
+PARENT_DIR = os.path.abspath(os.path.join(__CURR_DIR, os.pardir))
+CONFIG_PARSER = ConfigParser()
 
 
 def get_driver_path(driver_name):  # pylint : disable=R1710
@@ -34,8 +35,8 @@ def __get_config_path():
 def __get_config_parser():
     """Returns config parser object to operate on config.ini file."""
 
-    __CONFIG.read(__get_config_path())
-    return __CONFIG
+    CONFIG_PARSER.read(__get_config_path())
+    return CONFIG_PARSER
 
 
 def get_configure_framework_dir_path():
@@ -43,6 +44,11 @@ def get_configure_framework_dir_path():
        It basically returns the path of configure_framework folder
     """
     return __CURR_DIR
+
+
+def get_projects_root_dir_path():
+    """This method returns all projects root directory path. """
+    return PARENT_DIR
 
 
 def get_value_of(key, section_name):  # pylint : disable=R1710

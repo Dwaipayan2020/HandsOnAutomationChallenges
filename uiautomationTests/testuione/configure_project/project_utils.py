@@ -2,19 +2,19 @@
    to work with pytest.ini file .
 """
 import os
-
+import sys
+import time
 from datetime import datetime
 
-from uiautomationtests.testuione.configure_project.config_utils import get_config_parser_current_project
-from uiautomationtests.testuione.configure_project.config_utils import PARENT_DIR
-from uiautomationtests.testuione.configure_project.config_utils import get_pytest_config_path
+from uiautomationtests.configure_framework.pytest_config_utils import get_pytest_config_parser
+from uiautomationtests.configure_framework.pytest_config_utils import get_pytest_config_path
 
-__CFG_PARSER_DICT = get_config_parser_current_project()
-__DEFAULT_HTML_REPORT_PATH = PARENT_DIR+'\\reports\\'
-__DEFAULT_ALLURE_REPORT_PATH = PARENT_DIR+'\\allure_reports\\'
+__CFG_PARSER_DICT = get_pytest_config_parser()
+__DEFAULT_HTML_REPORT_PATH = './uiautomationtests/testuione/reports/'
+__DEFAULT_ALLURE_REPORT_PATH = './uiautomationtests/testuione/allure_reports/'
 __REPORT_ALL_FLAG = '-rA'
 __DEFAULT_HTML_FLAG = '--html='
-__DEFAULT_ALLURE_FLAG = ' alluredir='
+__DEFAULT_ALLURE_FLAG = ' --alluredir='
 __VERBOSE_FLAG = ' -v '
 __K_FLAG = ' -k '
 __STD_OUTPUT_FLAG = '-s'
@@ -22,6 +22,7 @@ __MARKER_FLAG = ' -m '
 __DEFAULT_HTML_REPORT_NAME = 'test_results.html'
 __IS_DYNAMIC_REPORT = True
 CURRENT_TIME_STAMP = datetime.now().strftime("%d%m%Y%H%M")
+LAUNCH_ALLURE_REPORT_COMMAND = 'allure serve ' + __DEFAULT_ALLURE_REPORT_PATH
 
 
 def __add_new_key_value(section, key, val):
@@ -114,7 +115,7 @@ def __add_markers(marker_data):
     """Adds or updates a new marker to markers field under pytest."""
 
     new_marker_desc = __get_markers() + '\n' + marker_data + \
-        ' : This marker was collected from \'marker_flag_change\'.\n '
+                      ' : This marker was collected from marker_flag_change\n'
     __update_value_of_key('pytest', 'markers', new_marker_desc)
 
 
@@ -240,26 +241,28 @@ def update_addopts(is_update, report_type):
     new_addopts_str = ''
     if is_update:
         if report_type.lower() == 'html':
-            new_addopts_str = f'{__DEFAULT_HTML_FLAG}.strip() \
-                {__update_html_reporter_path_change()}.strip() \
-                {__update_new_report_name(__IS_DYNAMIC_REPORT)}.strip() \
-                {" "+__REPORT_ALL_FLAG}.strip() \
-                {__get_k_flag_change()}.strip() {" "} \
-                {__get_marker_flag_change()}.strip() {" "} \
-                {__VERBOSE_FLAG}.strip() {" "} \
-                {__STD_OUTPUT_FLAG}.strip()'
+            new_addopts_str = "".join([__DEFAULT_HTML_FLAG, __update_html_reporter_path_change(),
+                                       __update_new_report_name(__IS_DYNAMIC_REPORT), " ",
+                                       __REPORT_ALL_FLAG, " ", __get_k_flag_change(),
+                                       __get_k_flag_change(),
+                                       " ", __get_marker_flag_change(), " ", __VERBOSE_FLAG,
+                                       " ", __STD_OUTPUT_FLAG])
         elif report_type.lower() == 'allure':
-            new_addopts_str = f'{__DEFAULT_ALLURE_FLAG}.strip() \
-                            {__DEFAULT_ALLURE_REPORT_PATH}.strip()\
-                            {"  " + __REPORT_ALL_FLAG}.strip() \
-                            {__get_k_flag_change()}.strip() {"  "} \
-                            {__get_marker_flag_change()}.strip() {" "} \
-                            {__VERBOSE_FLAG}.strip() {"  "} \
-                            {__STD_OUTPUT_FLAG}.strip()'
+            new_addopts_str = "".join([" ", __REPORT_ALL_FLAG, __get_k_flag_change(), " ",
+                                       __get_marker_flag_change(), " ",
+                                       __VERBOSE_FLAG, " ", __STD_OUTPUT_FLAG,
+                                       " ", __DEFAULT_ALLURE_FLAG,
+                                       __DEFAULT_ALLURE_REPORT_PATH])
         if not __CFG_PARSER_DICT.has_option('pytest', 'addopts'):
             __CFG_PARSER_DICT.set('pytest', 'addopts', '')
-            with open(get_pytest_config_path(), 'w', encoding='utf-8') as file:
-                __CFG_PARSER_DICT.write(file)
+        with open(get_pytest_config_path(), 'w', encoding='utf-8') as file:
+            __CFG_PARSER_DICT.write(file)
 
         print("addopts=" + new_addopts_str)
         __update_value_of_key('pytest', 'addopts', new_addopts_str)
+
+
+def launch_allure_report(command):
+    os.system(f'cmd /k "{command}"')
+    os.system(f'cmd /k "exit"')
+
